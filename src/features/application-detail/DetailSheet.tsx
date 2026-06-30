@@ -5,7 +5,7 @@ import { StatusPill } from '@/shared/ui/StatusPill'
 import { Icon } from '@/shared/ui/icons'
 import { Dialog } from '@/shared/ui/Dialog'
 import { useStore } from '@/store/useStore'
-import { useApplication, useBankName } from '@/store/selectors'
+import { useAgent, useApplication, useBankName } from '@/store/selectors'
 import { openIssue } from '@/domain/issues'
 import { formatDate, formatINR, newId, nowIso, relativeAge } from '@/shared/lib/utils'
 import type { AnyStatus, DocumentMeta } from '@/shared/types'
@@ -28,6 +28,7 @@ export function DetailSheet({ id, onClose }: { id: string; onClose: () => void }
   const setOverride = useStore((s) => s.setCommissionOverride)
   const updateApp = useStore((s) => s.updateApplication)
   const bank = useBankName(app?.loan.bankId)
+  const agent = useAgent(app?.createdBy)
   const { toast } = useToast()
   const [dialog, setDialog] = useState<DialogKind>(null)
   const [overrideVal, setOverrideVal] = useState('')
@@ -102,6 +103,19 @@ export function DetailSheet({ id, onClose }: { id: string; onClose: () => void }
 
       {/* Sections */}
       <div className="space-y-5">
+        <Section title="General Agent">
+          {agent ? (
+            <div className="flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-line)] bg-[var(--color-muted)] px-4 py-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--color-brand-soft)] text-[var(--color-brand)]"><Icon.User width={16} height={16} /></span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[var(--color-ink)]">{agent.name} <span className="font-normal text-[var(--color-muted-ink)]">· {agent.code}</span></p>
+                {agent.contact && <p className="text-[13px] text-[var(--color-muted-ink)]">{agent.contact}</p>}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--color-muted-ink)]">—</p>
+          )}
+        </Section>
         <Section title="Applicant & KYC">
           <Grid rows={[['Full name', app.applicant.fullName], ['Category', app.applicant.category], ['PAN', app.applicant.pan], ['Aadhaar', app.applicant.aadhaar], ['Mobile', app.applicant.mobile], ['Email', app.applicant.email], ['City', app.applicant.city], ['PIN', app.applicant.pin]]} />
         </Section>
