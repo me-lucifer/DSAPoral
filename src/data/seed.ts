@@ -223,6 +223,80 @@ function buildSeedApplications(): { applications: Application[]; payouts: Payout
   a8.statusHistory = []
   apps.push(a8)
 
+  // ---- Additional volume so the board reads as a busy operation ----
+
+  // Submitted
+  const a9 = baseApp({ loanType: 'Personal', status: 'Submitted', name: 'Anita Desai', amount: 450000, bankId: 'bank-icici', createdBy: 'agent-priya', daysOld: 1 })
+  a9.statusHistory = history([[null, 'Submitted', 1]])
+  apps.push(a9)
+
+  const a10 = baseApp({ loanType: 'Auto', status: 'Submitted', name: 'Karthik Menon', amount: 950000, bankId: 'bank-axis', createdBy: 'agent-rahul', daysOld: 2 })
+  a10.statusHistory = history([[null, 'Submitted', 2]])
+  apps.push(a10)
+
+  // Under Review
+  const a11 = baseApp({ loanType: 'Personal', status: 'Under Review', name: 'Pooja Gupta', amount: 550000, bankId: 'bank-hdfc', createdBy: 'agent-amit', daysOld: 3 })
+  a11.statusHistory = history([[null, 'Submitted', 3], ['Submitted', 'Under Review', 1]])
+  apps.push(a11)
+
+  // Submitted to Bank
+  const a12 = baseApp({ loanType: 'Business', status: 'Submitted to Bank', name: 'Imran Khan', amount: 1800000, bankId: 'bank-icici', createdBy: 'agent-priya', daysOld: 6 })
+  a12.verified = true
+  a12.bankLogin = { date: daysAgoIso(2), reference: 'ICICI-LN-90233' }
+  a12.statusHistory = history([[null, 'Submitted', 6], ['Submitted', 'Under Review', 5], ['Under Review', 'Submitted to Bank', 2]])
+  apps.push(a12)
+
+  const a13 = baseApp({ loanType: 'Home', status: 'Submitted to Bank', name: 'Lakshmi Pillai', amount: 6500000, bankId: 'bank-sbi', createdBy: 'agent-rahul', daysOld: 8 })
+  a13.verified = true
+  a13.bankLogin = { date: daysAgoIso(3), reference: 'SBI-LN-44781' }
+  a13.statusHistory = history([[null, 'Submitted', 8], ['Submitted', 'Under Review', 6], ['Under Review', 'Submitted to Bank', 3]])
+  apps.push(a13)
+
+  // Bank Processing
+  const a14 = baseApp({ loanType: 'Personal', status: 'Bank Processing', name: 'Sanjay Mehta', amount: 700000, bankId: 'bank-kotak', createdBy: 'agent-amit', daysOld: 10 })
+  a14.verified = true
+  a14.bankLogin = { date: daysAgoIso(7), reference: 'KOTAK-LN-33442' }
+  a14.statusHistory = history([[null, 'Submitted', 10], ['Submitted', 'Under Review', 9], ['Under Review', 'Submitted to Bank', 7], ['Submitted to Bank', 'Bank Processing', 5]])
+  apps.push(a14)
+
+  // Sanctioned
+  const a15 = baseApp({ loanType: 'Auto', status: 'Sanctioned', name: 'Neha Kapoor', amount: 1100000, bankId: 'bank-axis', createdBy: 'agent-priya', daysOld: 13 })
+  a15.verified = true
+  a15.bankLogin = { date: daysAgoIso(11), reference: 'AXIS-LN-61290' }
+  a15.sanction = { amount: 1100000, interestRate: 9.9, tenureMonths: 60, date: daysAgoIso(2), bankId: 'bank-axis' }
+  a15.statusHistory = history([[null, 'Submitted', 13], ['Submitted', 'Under Review', 12], ['Under Review', 'Submitted to Bank', 11], ['Submitted to Bank', 'Bank Processing', 8], ['Bank Processing', 'Sanctioned', 2]])
+  apps.push(a15)
+
+  // Disbursed, commission pending (Rahul)
+  const a16 = baseApp({ loanType: 'Business', status: 'Disbursed', name: 'Rohit Sinha', amount: 1500000, bankId: 'bank-hdfc', createdBy: 'agent-rahul', daysOld: 18 })
+  a16.verified = true
+  a16.bankLogin = { date: daysAgoIso(15), reference: 'HDFC-LN-50912' }
+  a16.sanction = { amount: 1500000, interestRate: 10.5, tenureMonths: 48, date: daysAgoIso(5), bankId: 'bank-hdfc' }
+  a16.disbursement = { amount: 1500000, date: daysAgoIso(3) }
+  a16.disbursedToApplicant = { amount: 1500000, date: daysAgoIso(3) }
+  a16.commission = { id: newId(), applicationId: a16.id, payeeAgentId: 'agent-rahul', basis: 'Percentage', rate: 1.5, base: 1500000, computedAmount: 22500, effectiveAmount: 22500, computedAt: daysAgoIso(3) }
+  a16.statusHistory = history([[null, 'Submitted', 18], ['Submitted', 'Under Review', 17], ['Under Review', 'Submitted to Bank', 15], ['Submitted to Bank', 'Bank Processing', 12], ['Bank Processing', 'Sanctioned', 5], ['Sanctioned', 'Disbursed', 3]])
+  apps.push(a16)
+
+  // Closed, commission paid (Priya)
+  const a17 = baseApp({ loanType: 'Personal', status: 'Closed', name: 'Anjali Rao', amount: 500000, bankId: 'bank-icici', createdBy: 'agent-priya', daysOld: 34 })
+  a17.verified = true
+  a17.bankLogin = { date: daysAgoIso(30), reference: 'ICICI-LN-21188' }
+  a17.sanction = { amount: 500000, interestRate: 11.2, tenureMonths: 36, date: daysAgoIso(16), bankId: 'bank-icici' }
+  a17.disbursement = { amount: 500000, date: daysAgoIso(12) }
+  a17.disbursedToApplicant = { amount: 500000, date: daysAgoIso(12) }
+  a17.commission = { id: newId(), applicationId: a17.id, payeeAgentId: 'agent-priya', basis: 'Percentage', rate: 2.0, base: 500000, computedAmount: 10000, effectiveAmount: 10000, computedAt: daysAgoIso(12) }
+  payouts.push({ id: newId(), applicationId: a17.id, agentId: 'agent-priya', amount: 10000, mode: 'NEFT / Bank Transfer', date: daysAgoIso(9), reference: 'NEFT-7741920', tds: 500, status: 'Paid', createdAt: daysAgoIso(9) })
+  a17.statusHistory = history([[null, 'Submitted', 34], ['Submitted', 'Under Review', 32], ['Under Review', 'Submitted to Bank', 30], ['Submitted to Bank', 'Bank Processing', 25], ['Bank Processing', 'Sanctioned', 16], ['Sanctioned', 'Disbursed', 12], ['Disbursed', 'Closed', 9]])
+  apps.push(a17)
+
+  // On Hold (Amit) — gives Amit an extra visible card too
+  const a18 = baseApp({ loanType: 'Home', status: 'On Hold', name: 'Farhan Qureshi', amount: 5200000, bankId: 'bank-sbi', createdBy: 'agent-amit', daysOld: 11 })
+  a18.priorStatus = 'Under Review'
+  a18.holdReason = 'Awaiting property valuation report.'
+  a18.statusHistory = history([[null, 'Submitted', 11], ['Submitted', 'Under Review', 9], ['Under Review', 'On Hold', 4]])
+  apps.push(a18)
+
   return { applications: apps, payouts }
 }
 

@@ -36,15 +36,23 @@ export function BoardPage() {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(KeyboardSensor))
 
+  const agents = useStore((s) => s.data.agents)
+  const agentNameOf = (id: string) => agents.find((a) => a.id === id)?.name ?? ''
+
   const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
     return apps.filter((a) => {
       if (a.status === 'Draft' && role === 'admin') return false
-      if (search && !a.applicant.fullName.toLowerCase().includes(search.toLowerCase())) return false
+      if (q) {
+        const hay = `${a.applicant.fullName} ${agentNameOf(a.createdBy)}`.toLowerCase()
+        if (!hay.includes(q)) return false
+      }
       if (loanType && a.loanType !== loanType) return false
       if (onlyIssues && !hasOpenIssue(a)) return false
       return true
     })
-  }, [apps, search, loanType, onlyIssues, role])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apps, search, loanType, onlyIssues, role, agents])
 
   const byColumn = useMemo(() => {
     const m = new Map<AnyStatus, Application[]>()
@@ -94,7 +102,7 @@ export function BoardPage() {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Icon.Search width={15} height={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search applicant…" className="h-9 w-48 pl-8" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search applicant or agent…" className="h-9 w-56 pl-8" />
           </div>
           <select value={loanType} onChange={(e) => setLoanType(e.target.value)} className="h-9 rounded-md border border-[var(--color-line)] bg-white px-2 text-[13px]">
             <option value="">All loan types</option>

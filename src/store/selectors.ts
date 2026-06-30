@@ -27,6 +27,10 @@ export function useAgentName(agentId: string | null | undefined): string {
   return useStore((s) => s.data.agents.find((a) => a.id === agentId)?.name ?? '—')
 }
 
+export function useAgent(agentId: string | null | undefined) {
+  return useStore((s) => s.data.agents.find((a) => a.id === agentId))
+}
+
 export function useBankName(bankId: string | null | undefined): string {
   return useStore((s) => s.data.banks.find((b) => b.id === bankId)?.name ?? '—')
 }

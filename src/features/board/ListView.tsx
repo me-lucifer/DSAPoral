@@ -7,7 +7,10 @@ import type { Application } from '@/shared/types'
 
 export function ListView({ apps, onOpen }: { apps: Application[]; onOpen: (id: string) => void }) {
   const banks = useStore((s) => s.data.banks)
+  const agents = useStore((s) => s.data.agents)
+  const role = useStore((s) => s.ui.role)
   const bankName = (id?: string) => banks.find((b) => b.id === id)?.name ?? '—'
+  const agentName = (id?: string) => agents.find((a) => a.id === id)?.name ?? '—'
 
   if (apps.length === 0)
     return <div className="px-6 pb-6"><EmptyState title="Nothing here yet" body="No applications match your filters." /></div>
@@ -20,6 +23,7 @@ export function ListView({ apps, onOpen }: { apps: Application[]; onOpen: (id: s
             <th className="border-b border-[var(--color-line)] px-3 py-2 font-medium">Applicant</th>
             <th className="border-b border-[var(--color-line)] px-3 py-2 font-medium">Loan</th>
             <th className="border-b border-[var(--color-line)] px-3 py-2 font-medium">Amount</th>
+            {role === 'admin' && <th className="border-b border-[var(--color-line)] px-3 py-2 font-medium">Agent</th>}
             <th className="border-b border-[var(--color-line)] px-3 py-2 font-medium">Bank</th>
             <th className="border-b border-[var(--color-line)] px-3 py-2 font-medium">Status</th>
             <th className="border-b border-[var(--color-line)] px-3 py-2 font-medium">Age</th>
@@ -34,6 +38,7 @@ export function ListView({ apps, onOpen }: { apps: Application[]; onOpen: (id: s
               </td>
               <td className="border-b border-[var(--color-line)] px-3 py-2.5"><Chip>{a.loanType}</Chip></td>
               <td className="border-b border-[var(--color-line)] px-3 py-2.5 tnum font-semibold">{formatINR(a.loan.amount)}</td>
+              {role === 'admin' && <td className="border-b border-[var(--color-line)] px-3 py-2.5 text-[var(--color-muted-ink)]">{agentName(a.createdBy)}</td>}
               <td className="border-b border-[var(--color-line)] px-3 py-2.5 text-[var(--color-muted-ink)]">{bankName(a.loan.bankId)}</td>
               <td className="border-b border-[var(--color-line)] px-3 py-2.5"><StatusPill status={a.status} /></td>
               <td className="border-b border-[var(--color-line)] px-3 py-2.5 text-[var(--color-muted-ink)]">{relativeAge(a.statusHistory[a.statusHistory.length - 1]?.at ?? a.updatedAt)}</td>
